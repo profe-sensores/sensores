@@ -3,99 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ejercicio interactivo — Sensores en Robótica</title>
+<title>Caso práctico digital: Sensores en Robótica</title>
 <style>
-:root{--verde:#15803d;--verde-cl:#dcfce7;--rojo:#b91c1c;--rojo-cl:#fee2e2;--tinta:#0f172a;--gris:#64748b;--borde:#e2e8f0;--acento:#0ea5e9;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--tinta);background:linear-gradient(160deg,#f1f5f9,#e2e8f0);line-height:1.55;padding:18px;}
-.wrap{max-width:760px;margin:0 auto;}
-header.top{text-align:center;padding:26px 20px;background:linear-gradient(135deg,#0f172a,#14532d);color:#fff;border-radius:18px;box-shadow:0 10px 30px rgba(15,23,42,.18);}
-header.top h1{font-size:1.5rem;margin-bottom:6px;}
-header.top p{opacity:.85;font-size:.95rem;}
-.intro{background:#fff;border:1px solid var(--borde);border-radius:14px;padding:16px 18px;margin:18px 0;font-size:.95rem;color:#334155;}
-.intro strong{color:var(--verde);}
-.q{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 4px 14px rgba(15,23,42,.05);}
-.q legend,.q .num{display:inline-block;background:var(--verde);color:#fff;font-weight:700;font-size:.8rem;padding:4px 12px;border-radius:999px;margin-bottom:10px;letter-spacing:.5px;}
-.q h2{font-size:1.08rem;margin-bottom:6px;}
-.q .esc{color:var(--gris);font-size:.93rem;margin-bottom:14px;}
-.opt{display:block;border:1.5px solid var(--borde);border-radius:11px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:.15s;position:relative;}
-.opt:hover{border-color:var(--acento);background:#f8fafc;}
-.opt input{margin-right:9px;accent-color:var(--verde);}
-.opt .fb{display:none;margin-top:9px;padding:9px 12px;border-radius:9px;font-size:.9rem;}
-.opt input:checked ~ .fb{display:block;}
-.opt.ok input:checked ~ .fb{background:var(--verde-cl);color:var(--verde);border-left:4px solid var(--verde);}
-.opt.no input:checked ~ .fb{background:var(--rojo-cl);color:var(--rojo);border-left:4px solid var(--rojo);}
-.opt.ok:has(input:checked){border-color:var(--verde);background:var(--verde-cl);}
-.opt.no:has(input:checked){border-color:var(--rojo);background:var(--rojo-cl);}
-footer{text-align:center;color:var(--gris);font-size:.85rem;padding:18px 0 4px;}
-.badge{display:inline-block;font-weight:700;color:var(--verde);}
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --accent:#38bdf8;
+    --ok:#22c55e; --warn:#f59e0b; --txt:#e2e8f0; --muted:#94a3b8; --line:#334155;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{padding:24px 20px 10px;text-align:center}
+  header h1{margin:0;font-size:26px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px 20px 40px}
+  .sim input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0}
+  .controls label{cursor:pointer;background:var(--panel2);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;font-size:14px;color:var(--muted);transition:.2s;user-select:none}
+  .controls label:hover{border-color:var(--accent);color:var(--txt)}
+  .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .scene{position:relative;background:linear-gradient(180deg,#111c33,#0c1526);
+    border:1px solid var(--line);border-radius:16px;padding:18px;min-height:360px;overflow:hidden}
+  .floor{position:absolute;left:0;right:0;bottom:46px;height:3px;background:var(--line)}
+  .conveyor{position:absolute;left:24px;bottom:49px;width:230px;height:14px;background:repeating-linear-gradient(90deg,#334155 0 14px,#475569 14px 28px);border-radius:3px}
+  .cell{position:absolute;right:40px;bottom:49px;width:120px;height:70px;border:2px dashed var(--line);border-radius:8px}
+  .cell::after{content:'Zona de ensamblaje';position:absolute;top:-20px;left:0;font-size:11px;color:var(--muted)}
+  .part{position:absolute;bottom:63px;width:26px;height:20px;background:#9ca3af;border:2px solid #cbd5e1;border-radius:3px;transition:left 1s ease, bottom 1s ease, opacity .4s;left:40px}
+  .arm{position:absolute;top:24px;left:50%;width:120px;height:170px;transition:transform 1s ease;transform:translateX(-150px)}
+  .seg{position:absolute;left:50%;background:#64748b;border:1px solid #94a3b8;border-radius:6px;transform-origin:top center}
+  .seg1{top:0;width:16px;height:70px;margin-left:-8px}
+  .seg2{top:66px;width:14px;height:62px;margin-left:-7px;background:#52607a}
+  .gripper{position:absolute;top:124px;left:50%;margin-left:-14px;width:28px;height:20px;
+    border:3px solid var(--accent);border-top:none;border-radius:0 0 6px 6px;transition:.3s}
+  .base{position:absolute;top:-6px;left:50%;margin-left:-26px;width:52px;height:14px;background:#475569;border-radius:4px}
+  .badge{position:absolute;font-size:11px;padding:3px 7px;border-radius:6px;background:var(--panel2);
+    border:1px solid var(--line);color:var(--muted);transition:.3s;white-space:nowrap}
+  .b-foto{left:150px;bottom:92px}
+  .b-ind{left:40px;bottom:118px}
+  .b-enc{top:14px;left:52%}
+  .b-carga{top:150px;left:52%}
+  .b-fin{right:48px;bottom:92px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .panel h2{margin:0 0 4px;font-size:17px;color:var(--accent)}
+  .stepnum{font-size:13px;color:var(--muted);margin-bottom:10px}
+  .step{display:none}
+  .step p{margin:0 0 10px}
+  .tag{display:inline-block;font-size:12px;background:rgba(56,189,248,.15);color:var(--accent);
+    border:1px solid rgba(56,189,248,.4);padding:2px 8px;border-radius:6px;margin:2px 4px 2px 0}
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:22px}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="top">
-<h1>Sensores en Robótica</h1>
-<p>Ejercicio interactivo · Electroneumática y Oleohidráulica</p>
+<header>
+  <h1>Caso práctico digital: Sensores en Robótica</h1>
+  <p>Celda de ensamblaje <strong>pick &amp; place</strong> con brazo robótico de 6 ejes — pulsa cada paso</p>
 </header>
-<div class="intro">Una <strong>célula robotizada</strong> necesita sensores en cada etapa del proceso. Lee cada situación y elige el sensor más adecuado. Al seleccionar una opción verás de inmediato si es correcta y por qué. ¡Completa los 6 pasos!</div>
-
-<fieldset class="q">
-<legend>Paso 1</legend>
-<h2>Detectar una pieza metálica en la cinta transportadora</h2>
-<p class="esc">Hay que confirmar la llegada de una pieza de acero, sin contacto físico y a corta distancia.</p>
-<label class="opt no"><input type="radio" name="q1">Sensor capacitivo<span class="fb">Detecta casi cualquier material, pero no es el idóneo para metales: daría falsos positivos con otros objetos.</span></label>
-<label class="opt ok"><input type="radio" name="q1">Sensor inductivo (proximidad)<span class="fb">¡Correcto! El sensor inductivo detecta metales sin contacto mediante corrientes de Foucault. Ideal para piezas metálicas.</span></label>
-<label class="opt no"><input type="radio" name="q1">Sensor de temperatura<span class="fb">Mide calor, no presencia. No sirve para detectar la pieza.</span></label>
-</fieldset>
-
-<fieldset class="q">
-<legend>Paso 2</legend>
-<h2>Detectar una pieza plástica (no metálica)</h2>
-<p class="esc">Ahora llega una pieza de plástico y hay que confirmar su presencia sin tocarla.</p>
-<label class="opt no"><input type="radio" name="q2">Sensor inductivo<span class="fb">Solo detecta metales; ignoraría la pieza plástica.</span></label>
-<label class="opt ok"><input type="radio" name="q2">Sensor capacitivo<span class="fb">¡Correcto! El capacitivo detecta materiales no metálicos (plástico, vidrio, líquidos) por variación de capacidad: C = ε·A/d.</span></label>
-<label class="opt no"><input type="radio" name="q2">Sensor de fuerza (galga)<span class="fb">Mide esfuerzo/carga, no presencia a distancia.</span></label>
-</fieldset>
-
-<fieldset class="q">
-<legend>Paso 3</legend>
-<h2>Confirmar la posición del vástago de un cilindro neumático</h2>
-<p class="esc">El brazo usa un cilindro neumático y debemos saber cuándo el vástago llega al final de carrera.</p>
-<label class="opt ok"><input type="radio" name="q3">Sensor magnético (reed) en el cilindro<span class="fb">¡Correcto! El émbolo lleva un imán; el sensor magnético montado en el cuerpo detecta su posición final de carrera.</span></label>
-<label class="opt no"><input type="radio" name="q3">Sensor óptico de barrera<span class="fb">Posible en otros montajes, pero el magnético es el estándar y más simple en cilindros.</span></label>
-<label class="opt no"><input type="radio" name="q3">Sensor de nivel<span class="fb">Sirve para líquidos en depósitos, no para la carrera de un cilindro.</span></label>
-</fieldset>
-
-<fieldset class="q">
-<legend>Paso 4</legend>
-<h2>Vigilar el nivel de aceite del depósito oleohidráulico</h2>
-<p class="esc">La central hidráulica no debe trabajar si el aceite baja de un mínimo de seguridad.</p>
-<label class="opt no"><input type="radio" name="q4">Sensor inductivo<span class="fb">Detecta metales puntuales, no el nivel de un fluido.</span></label>
-<label class="opt no"><input type="radio" name="q4">Sensor ultrasónico para piezas<span class="fb">Aunque hay sensores de nivel ultrasónicos, aquí la respuesta directa es el sensor de nivel.</span></label>
-<label class="opt ok"><input type="radio" name="q4">Sensor de nivel<span class="fb">¡Correcto! El sensor de nivel (flotador, capacitivo o ultrasónico) vigila el aceite y protege la bomba frente a marcha en seco.</span></label>
-</fieldset>
-
-<fieldset class="q">
-<legend>Paso 5</legend>
-<h2>Controlar la presión del circuito oleohidráulico</h2>
-<p class="esc">El sistema debe actuar cuando la presión alcanza un valor de consigna.</p>
-<label class="opt ok"><input type="radio" name="q5">Presostato / sensor de presión<span class="fb">¡Correcto! Mide la presión (P = F/A) y envía la señal al PLC al llegar a la consigna.</span></label>
-<label class="opt no"><input type="radio" name="q5">Sensor óptico<span class="fb">Detecta presencia/distancia, no presión del fluido.</span></label>
-<label class="opt no"><input type="radio" name="q5">Sensor magnético<span class="fb">Sirve para posición en cilindros, no para medir presión.</span></label>
-</fieldset>
-
-<fieldset class="q">
-<legend>Paso 6</legend>
-<h2>Medir la distancia del brazo al objeto a tomar</h2>
-<p class="esc">El robot debe conocer la distancia a un objeto que puede variar de tamaño y color.</p>
-<label class="opt no"><input type="radio" name="q6">Sensor capacitivo de contacto<span class="fb">Funciona a muy corta distancia; no mide distancias variables de forma fiable.</span></label>
-<label class="opt no"><input type="radio" name="q6">Sensor de temperatura<span class="fb">No aporta información de distancia.</span></label>
-<label class="opt ok"><input type="radio" name="q6">Sensor ultrasónico<span class="fb">¡Correcto! El ultrasónico mide distancia por tiempo de vuelo del sonido, sin importar color ni transparencia del objeto.</span></label>
-</fieldset>
-
-<div class="intro" style="text-align:center">✔ Has recorrido los <span class="badge">6 pasos</span> de la célula robotizada. Cada etapa del proceso quedó cubierta por el sensor adecuado: inductivo, capacitivo, magnético, de nivel, de presión y ultrasónico.</div>
-
-<footer>Material didáctico · Sensórica en Electroneumática y Oleohidráulica · Asignatura: Neumática Hidráulica</footer>
+<div class="wrap">
+<div class="sim">
+<style>
+  /* Estados por paso (CSS puro, sin scripts) */
+  #p1:checked ~ .controls label[for=p1],#p2:checked ~ .controls label[for=p2],
+  #p3:checked ~ .controls label[for=p3],#p4:checked ~ .controls label[for=p4],
+  #p5:checked ~ .controls label[for=p5],#p6:checked ~ .controls label[for=p6]{
+    background:var(--accent);color:#06283d;border-color:var(--accent);font-weight:600}
+  /* Posición del brazo */
+  #p1:checked ~ .grid .arm,#p2:checked ~ .grid .arm,#p3:checked ~ .grid .arm{transform:translateX(150px)}
+  #p4:checked ~ .grid .arm{transform:translateX(-150px)}
+  #p5:checked ~ .grid .arm{transform:translateX(40px)}
+  #p6:checked ~ .grid .arm{transform:translateX(150px)}
+  /* Pinza cerrada al tomar/trasladar */
+  #p4:checked ~ .grid .gripper,#p5:checked ~ .grid .gripper{width:18px;margin-left:-9px;border-color:var(--ok)}
+  /* Pieza */
+  #p1:checked ~ .grid .part{left:40px;bottom:63px}
+  #p2:checked ~ .grid .part{left:150px;bottom:63px}
+  #p3:checked ~ .grid .part{left:210px;bottom:63px}
+  #p4:checked ~ .grid .part{left:210px;bottom:120px}
+  #p5:checked ~ .grid .part{left:300px;bottom:150px}
+  #p6:checked ~ .grid .part{left:360px;bottom:63px}
+  /* Sensores activos */
+  #p2:checked ~ .grid .b-foto{background:var(--warn);color:#2a1a00;border-color:var(--warn)}
+  #p3:checked ~ .grid .b-ind{background:var(--warn);color:#2a1a00;border-color:var(--warn)}
+  #p4:checked ~ .grid .b-enc,#p5:checked ~ .grid .b-enc,#p6:checked ~ .grid .b-enc{background:var(--accent);color:#06283d;border-color:var(--accent)}
+  #p4:checked ~ .grid .b-carga{background:var(--ok);color:#042a12;border-color:var(--ok)}
+  #p1:checked ~ .grid .b-fin,#p6:checked ~ .grid .b-fin{background:var(--ok);color:#042a12;border-color:var(--ok)}
+  /* Texto del panel */
+  #p1:checked ~ .grid .panel .s1,#p2:checked ~ .grid .panel .s2,
+  #p3:checked ~ .grid .panel .s3,#p4:checked ~ .grid .panel .s4,
+  #p5:checked ~ .grid .panel .s5,#p6:checked ~ .grid .panel .s6{display:block}
+</style>
+<input type="radio" name="paso" id="p1" checked>
+<input type="radio" name="paso" id="p2">
+<input type="radio" name="paso" id="p3">
+<input type="radio" name="paso" id="p4">
+<input type="radio" name="paso" id="p5">
+<input type="radio" name="paso" id="p6">
+<div class="controls">
+  <label for="p1">1 · Reposo (Home)</label>
+  <label for="p2">2 · Llegada de pieza</label>
+  <label for="p3">3 · Confirmación</label>
+  <label for="p4">4 · Toma</label>
+  <label for="p5">5 · Traslado</label>
+  <label for="p6">6 · Colocación y retorno</label>
+</div>
+<div class="grid">
+  <div class="scene">
+    <div class="floor"></div>
+    <div class="conveyor"></div>
+    <div class="cell"></div>
+    <div class="part"></div>
+    <div class="arm">
+      <div class="base"></div>
+      <div class="seg seg1"></div>
+      <div class="seg seg2"></div>
+      <div class="gripper"></div>
+    </div>
+    <div class="badge b-foto">🔶 Fotoeléctrico</div>
+    <div class="badge b-ind">🔶 Inductivo</div>
+    <div class="badge b-enc">⚙️ Encoders (6 ejes)</div>
+    <div class="badge b-carga">➕ Celda de carga</div>
+    <div class="badge b-fin">🟢 Final de carrera</div>
+  </div>
+  <div class="panel">
+    <h2>Secuencia del ejercicio</h2>
+    <div class="stepnum">Brazo robótico de 6 ejes · celda pick &amp; place</div>
+    <div class="step s1">
+      <p><strong>Paso 1 — Reposo (Home).</strong> El brazo está en su posición de referencia. El <strong>final de carrera</strong> confirma la posición “home” como punto de partida seguro.</p>
+      <span class="tag">Final de carrera: ON</span><span class="tag">Seguridad / referencia</span>
+    </div>
+    <div class="step s2">
+      <p><strong>Paso 2 — Llegada de la pieza.</strong> La pieza avanza por la cinta transportadora. El <strong>sensor fotoeléctrico</strong> detecta su presencia al cortar el haz de luz.</p>
+      <span class="tag">Fotoeléctrico: ON</span><span class="tag">Detección de presencia</span>
+    </div>
+    <div class="step s3">
+      <p><strong>Paso 3 — Confirmación de material.</strong> El <strong>sensor inductivo</strong> confirma que la pieza es metálica antes de tomarla (evita manipular piezas incorrectas).</p>
+      <span class="tag">Inductivo: ON</span><span class="tag">¿Es metálica? Sí</span>
+    </div>
+    <div class="step s4">
+      <p><strong>Paso 4 — Toma de la pieza.</strong> El brazo se mueve usando la realimentación de los <strong>encoders</strong>. La <strong>celda de carga</strong> en la pinza regula la fuerza de agarre para no dañar la pieza.</p>
+      <span class="tag">Encoders: lazo cerrado</span><span class="tag">Celda de carga: fuerza OK</span>
+    </div>
+    <div class="step s5">
+      <p><strong>Paso 5 — Traslado.</strong> El brazo lleva la pieza hacia la zona de ensamblaje. Los <strong>encoders</strong> mantienen la posición exacta de cada eje durante el movimiento.</p>
+      <span class="tag">Encoders: posición exacta</span><span class="tag">Precisión y repetibilidad</span>
+    </div>
+    <div class="step s6">
+      <p><strong>Paso 6 — Colocación y retorno.</strong> El brazo coloca la pieza y regresa a “home”, verificado nuevamente por el <strong>final de carrera</strong>. El ciclo puede repetirse.</p>
+      <span class="tag">Final de carrera: ON</span><span class="tag">Ciclo completado</span>
+    </div>
+  </div>
+</div>
+</div>
+<footer>Nota didáctica: la pinza puede ser neumática (electroválvula) o, en robots de alta carga, con actuadores hidráulicos. Los sensores aportan percepción y realimentación en lazo cerrado.</footer>
 </div>
 </body>
 </html>
